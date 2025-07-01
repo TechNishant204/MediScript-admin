@@ -14,12 +14,22 @@ const AdminContextProvider = (props) => {
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
+  // Create axios instance with proper CORS configuration
+  const createAxiosConfig = (token) => ({
+    withCredentials: true,
+    headers: {
+      "Content-Type": "application/json",
+      // Backend expects 'atoken' (lowercase) based on authAdmin middleware
+      atoken: token || aToken,
+    },
+  });
+
   const getAllDoctors = async () => {
     try {
       const { data } = await axios.post(
         backendUrl + "/api/admin/all-doctors",
         {},
-        { headers: { aToken } }
+        createAxiosConfig()
       );
       if (data.success) {
         setDoctors(data.doctors);
@@ -28,7 +38,8 @@ const AdminContextProvider = (props) => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      console.error("Get doctors error:", error);
+      toast.error(error.response?.data?.message || error.message);
     }
   };
 
@@ -37,7 +48,7 @@ const AdminContextProvider = (props) => {
       const { data } = await axios.post(
         backendUrl + "/api/admin/change-availability",
         { docId },
-        { headers: { aToken } }
+        createAxiosConfig()
       );
       if (data.success) {
         toast.success(data.message);
@@ -46,15 +57,17 @@ const AdminContextProvider = (props) => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      console.error("Change availability error:", error);
+      toast.error(error.response?.data?.message || error.message);
     }
   };
 
   const getAllAppointments = async () => {
     try {
-      const { data } = await axios.get(backendUrl + "/api/admin/appointments", {
-        headers: { aToken },
-      });
+      const { data } = await axios.get(
+        backendUrl + "/api/admin/appointments",
+        createAxiosConfig()
+      );
 
       if (data.success) {
         setAppointments(data.appointments);
@@ -63,7 +76,8 @@ const AdminContextProvider = (props) => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      console.error("Get appointments error:", error);
+      toast.error(error.response?.data?.message || error.message);
     }
   };
 
@@ -72,7 +86,7 @@ const AdminContextProvider = (props) => {
       const { data } = await axios.post(
         backendUrl + "/api/admin/cancel-appointment",
         { appointmentId },
-        { headers: { aToken } }
+        createAxiosConfig()
       );
       if (data.success) {
         toast.success(data.message);
@@ -81,15 +95,17 @@ const AdminContextProvider = (props) => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      console.error("Cancel appointment error:", error);
+      toast.error(error.response?.data?.message || error.message);
     }
   };
 
   const getDashData = async () => {
     try {
-      const { data } = await axios.get(backendUrl + "/api/admin/dashboard", {
-        headers: { aToken },
-      });
+      const { data } = await axios.get(
+        backendUrl + "/api/admin/dashboard",
+        createAxiosConfig()
+      );
 
       if (data.success) {
         setDashData(data.dashData);
@@ -98,7 +114,8 @@ const AdminContextProvider = (props) => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      console.error("Get dashboard data error:", error);
+      toast.error(error.response?.data?.message || error.message);
     }
   };
 
